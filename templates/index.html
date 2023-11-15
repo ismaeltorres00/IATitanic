@@ -15,12 +15,16 @@
  <div class="login">
 	<h1>Sales Forecasting</h1>
 
+  Pclass,Sex,Age,SibSp,Parch,Fare,Embarked
      <!-- Main Input For Receiving Query to our ML -->
     <form action="{{ url_for('predict')}}"method="post">
-    	<input type="text" name="rate" placeholder="rate" required="required" />
-        <input type="text" name="sales in first month" placeholder="sales in first month" required="required" />
-		<input type="text" name="sales in second month" placeholder="sales in second month" required="required" />
-        <button type="submit" class="btn btn-primary btn-block btn-large">Predict sales in third month</button>
+    	<input type="text" name="VIP" placeholder="pclass" required="required" />
+      <input type="text" name="Sexo" placeholder="sex" required="required" />
+		  <input type="text" name="Edad" placeholder="age" required="required" />
+      <input type="text" name="Hermanos-Cónyugues" placeholder="sibsp" required="required" />
+      <input type="text" name="Padres-Hijos" placeholder="parch" required="required" />
+		  <input type="text" name="Puerto" placeholder="embarked" required="required" />
+      <button type="submit" class="btn btn-primary btn-block btn-large">Predict sales in third month</button>
     </form>
 
    <br>
