@@ -1,0 +1,6 @@
+body {
+    background-image: url(''); /* Reemplaza 'tu_imagen.jpg' con la ruta de tu imagen */
+    background-size: cover; /* Ajusta la imagen al tamaño del viewport */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+    background-attachment: fixed; /* Fija la imagen de fondo para que no se desplace con el contenido */
+}
