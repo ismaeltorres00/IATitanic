@@ -1,84 +1,163 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Predicción de Supervivencia en el Titanic</title>
     <!-- Agregar enlaces a los archivos de Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="../static/css/style.css">
+    <style>
+        #predictionModal .modal-content {
+            background-image: url('../static/img/titanic.png'); /* Fondo del Titanic */
+            background-size: cover;
+        }
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
 
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content {
+            flex: 1 0 auto; /* Ocupa el espacio disponible */
+        }
+
+        .footer {
+            flex-shrink: 0; /* Evita que se reduzca */
+            position: sticky;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
 </head>
+
 <body>
-    <div class="container mt-5">
-        <h2>Predicción de Supervivencia en el Titanic</h2>
-        <form action="{{ url_for('predict')}}" method="post">
-            <div class="form-group">
-                <label for="pclass">Clase del Pasajero:</label>
-                <select class="form-control" id="pclass" name="pclass" required>
-                    <option value="" disabled selected>Seleccione una opción</option>
-                    <option value="1">Primera Clase</option>
-                    <option value="2">Segunda Clase</option>
-                    <option value="3">Tercera Clase</option>
-                </select>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">Titanic Predictor</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </nav>
+
+    <div class="content">
+        <div class="container mt-5">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Predicción de Supervivencia en el Titanic</h2>
+                    <form action="{{ url_for('predict')}}" method="post">
+                        <div class="form-group">
+                            <label for="pclass">Clase del Pasajero:</label>
+                            <select class="form-control" id="pclass" name="pclass" required>
+                                <option value="" disabled selected>Seleccione una opción</option>
+                                <option value="1">Primera Clase</option>
+                                <option value="2">Segunda Clase</option>
+                                <option value="3">Tercera Clase</option>
+                            </select>
+                        </div>
+    
+                        <div class="form-group">
+                            <label for="sex">Sexo:</label>
+                            <select class="form-control" id="sex" name="sex" required>
+                                <option value="" disabled selected>Seleccione una opción</option>
+                                <option value="0">Femenino</option>
+                                <option value="1">Masculino</option>
+                            </select>
+                        </div>
+    
+                        <div class="form-group">
+                            <label for="age">Edad:</label>
+                            <input type="number" class="form-control" id="age" name="age" required>
+                        </div>
+    
+                        <div class="form-group">
+                            <label for="sibsp">Número de Hermanos/Cónyuge a bordo:</label>
+                            <input type="number" class="form-control" id="sibsp" name="sibsp" required>
+                        </div>
+    
+                        <div class="form-group">
+                            <label for="parch">Número de Padres/Hijos a bordo:</label>
+                            <input type="number" class="form-control" id="parch" name="parch" required>
+                        </div>
+    
+                        <div class="form-group">
+                            <label for="fare">Tarifa:</label>
+                            <input type="number" class="form-control" id="fare" name="fare" step="0.01" required>
+                        </div>
+    
+                        <div class="form-group">
+                            <label for="embarked">Puerto de Embarque:</label>
+                            <select class="form-control" id="embarked" name="embarked" required>
+                                <option value="" disabled selected>Seleccione una opción</option>
+                                <option value="0">Cherbourg (C)</option>
+                                <option value="1">Queenstown (Q)</option>
+                                <option value="2">Southampton (S)</option>
+                            </select>
+                        </div>
+    
+                        <button type="submit" class="btn btn-primary">Predecir</button>
+                    </form>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label for="sex">Sexo:</label>
-                <select class="form-control" id="sex" name="sex" required>
-                    <option value="" disabled selected>Seleccione una opción</option>
-                    <option value="0">Femenino</option>
-                    <option value="1">Masculino</option>
-                </select>
+    
+            <div class="modal fade" id="predictionModal" tabindex="-1" aria-labelledby="predictionModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="predictionModalLabel">Predicción en Proceso</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="loadingAnimation">Cargando...</div>
+                            <div id="predictionResult" style="display:none;">
+                                <!-- Mostrar el resultado de la predicción -->
+                                <div class="mt-4">
+                                    {% if prediction_text == 0 %}
+                                    <p class="text-danger">Resultado: No sobrevive</p>
+                                    {% elif prediction_text == 1 %}
+                                    <p class="text-success">Resultado: Sobrevive</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label for="age">Edad:</label>
-                <input type="number" class="form-control" id="age" name="age" required>
-            </div>
-
-            <div class="form-group">
-                <label for="sibsp">Número de Hermanos/Cónyuge a bordo:</label>
-                <input type="number" class="form-control" id="sibsp" name="sibsp" required>
-            </div>
-
-            <div class="form-group">
-                <label for="parch">Número de Padres/Hijos a bordo:</label>
-                <input type="number" class="form-control" id="parch" name="parch" required>
-            </div>
-
-            <div class="form-group">
-                <label for="fare">Tarifa:</label>
-                <input type="number" class="form-control" id="fare" name="fare" step="0.01" required>
-            </div>
-
-            <div class="form-group">
-                <label for="embarked">Puerto de Embarque:</label>
-                <select class="form-control" id="embarked" name="embarked" required>
-                    <option value="" disabled selected>Seleccione una opción</option>
-                    <option value="0">Cherbourg (C)</option>
-                    <option value="1">Queenstown (Q)</option>
-                    <option value="2">Southampton (S)</option>
-                </select>
-            </div>
-
-
-
-            <button type="submit" class="btn btn-primary">Predecir</button>
-        </form>
-
-        <!-- Mostrar el resultado de la predicción -->
-        <div class="mt-4">
-            {% if prediction_text == 0 %}
-                <p class="text-danger">Resultado: No sobrevive</p>
-            {% elif prediction_text == 1 %}
-                <p class="text-success">Resultado: Sobrevive</p>
-            {% endif %}
+            
         </div>
     </div>
 
-    <!-- Agregar enlaces a los archivos de Bootstrap JS -->
+    <footer class="footer bg-light mt-5">
+        <div class="container text-center py-3">
+            <span>Desarrollado por Ismael Torres y Hugo Blanco - Aplicación de Predicción del Titanic</span>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('predictionForm').onsubmit = function() {
+            $('#predictionModal').modal('show');
+            
+            // Muestra la animación de carga durante 2 segundos
+            setTimeout(function() {
+                document.getElementById('loadingAnimation').style.display = 'none';
+                document.getElementById('predictionResult').style.display = 'block';
+                // Aquí debes actualizar el contenido de 'predictionResult' con el resultado real
+            }, 2000);
+
+            return false; // para evitar el envío del formulario
+        };
+    </script>
+
+    <!-- Bootstrap JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
+
 </html>
